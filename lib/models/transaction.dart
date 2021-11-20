@@ -1,13 +1,13 @@
 
 import 'package:flutter/foundation.dart';
 
-class Transanction{
+class Transaction{
   final String id;
   final String title;
   final double amount;
   final DateTime date;
 
-  Transanction({
+  Transaction({
 
       @required this.id ,
       @required this.title,

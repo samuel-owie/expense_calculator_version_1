@@ -1,11 +1,13 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables
 
-import './transaction.dart';
 import 'package:flutter/material.dart';
 
-main(){
-  runApp(MyApp());
-}
+import './widgets/chart.dart';
+import './widgets/new_transaction.dart';
+import './widgets/transaction_list.dart';
+import './models/transaction.dart';
+
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget{
   
@@ -13,93 +15,145 @@ class MyApp extends StatelessWidget{
   Widget build(BuildContext context){
 
     return MaterialApp(
-      title: 'Flutter App',
+      title: 'Personal Expenses',
+      theme: ThemeData(
+        primarySwatch: Colors.purple,
+        accentColor: Colors.amber,
+        errorColor: Colors.red,
+        fontFamily: 'QuickSand',
+        textTheme: ThemeData.light().textTheme.copyWith(
+          headline6: TextStyle(
+            fontFamily: 'OpenSans',
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            ),
+          button: TextStyle(
+            color: Colors.white,
+          )
+          ),
+        appBarTheme: AppBarTheme(
+          textTheme: ThemeData.light().textTheme.copyWith(
+            headline6: TextStyle(
+              fontFamily: 'OpenSans',
+              fontSize: 20,
+              )
+            ),
+          ),
+        //colorScheme.secondary: Colors.amber
+      ),
       home: MyHomePage(),
       );
   }
 }
 
-class MyHomePage extends StatelessWidget{
-  final List<Transanction> transactions = [
-    Transanction(
-      id: 't1',
-      title: 'New Shoes',
-      amount: 69.99,
-      date: DateTime.now()
-      ),
-      Transanction(
-      id: 't2',
-      title: 'Weekly Groceries',
-      amount: 16.99,
-      date: DateTime.now()
-      ),
-  ];
+class MyHomePage extends StatefulWidget{
   
+  //String titleInput;
+  //String amountInput;
   @override
-  Widget build(BuildContext context){
-    return Scaffold(
+  _MyHomePageState createState() => _MyHomePageState();
+}
 
-      appBar: AppBar(
-        title: Text('Flutter App'),
-      ),
+class _MyHomePageState extends State<MyHomePage> {
 
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
+    final List<Transaction> _userTransactions = [
+    // Transaction(
+    //   id: 't1',
+    //   title: 'New Shoes',
+    //   amount: 69.99,
+    //   date: DateTime.now()
+    //   ),
+    //   Transaction(
+    //   id: 't2',
+    //   title: 'Weekly Groceries',
+    //   amount: 16.99,
+    //   date: DateTime.now()
+    //   ),
+  ];
 
-        // first segment of app 
-        //second way of
-        Container(
+  List<Transaction> get _recentTranscations {
+    return _userTransactions.where((tx) {
+      return tx.date.isAfter(DateTime.now().subtract(
+        Duration(days: 7)));
+    }).toList();
+  }
 
-          width: double.infinity,
-          child: Card(
-            color: Colors.blue, 
-            child: Text('CHART!'),
-            elevation: 5,
-            ),
-          
-          ),
+  void _addNewTransaction(String txTitle, double txAmount, DateTime chosenDate){
+    final newTx = Transaction(
+      title: txTitle, 
+      amount: txAmount, 
+      date: chosenDate,
+      id: DateTime.now().toString()
+      );
 
-        
-        // one way of controlling the dimension contents can occupy in the screen.
-        /*
-        Card(
-          color: Colors.blue,
-          child: Container(
-            width: double.infinity,
-            child: Text('Chart!'),),
-          elevation: 5,
-          ),
-    */
-    
-         // second segment of app 
-        Column(
-          children: transactions.map((tx) {
-            return Card(
-              child: Row(children: <Widget>[
-                Container(
-                  child: Text(
-                    tx.amount.toString(),
-                    ),
-                  ),
+      setState(() {
+      _userTransactions.add(newTx);
+      });
+  }
 
-                  Column(
-                    children: <Widget>[
-                      Text(tx.title),
-                      Text(tx.date.toString()),
-                    ]
-                  )
-                ],
-              ),
-            );
-          }).toList(),
-        ),
-      ],
-
-      ),
-
+  void _startAddNewTransaction(BuildContext ctx){
+    showModalBottomSheet(
+      context: ctx, 
+      builder: (bCtx) {
+        return GestureDetector(
+          onTap: () {},
+          child: NewTransaction(_addNewTransaction),
+          behavior: HitTestBehavior.opaque,
+          );
+      }
       );
   }
 
+  @override
+  Widget build(BuildContext context){
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Personal Expenses'),
+        actions: <Widget>[
+          IconButton(
+            onPressed: () => _startAddNewTransaction(context), 
+            icon: Icon(Icons.add))
+
+        ],
+      ),
+
+      body: SingleChildScrollView(
+        child: Column(
+            //mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+        
+            // first segment of app 
+            //second way of
+              Chart(_recentTranscations),
+              TransactionList(_userTransactions)
+        
+        
+        
+            
+            // one way of controlling the dimension contents can occupy in the screen.
+            /*
+            Card(
+              color: Colors.blue,
+              child: Container(
+                width: double.infinity,
+                child: Text('Chart!'),),
+              elevation: 5,
+              ),
+            */
+            
+             // second segment of app 
+            
+          ],
+        
+          ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () => _startAddNewTransaction(context),
+      ),
+
+      );
+    }
 }
