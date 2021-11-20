@@ -131,6 +131,7 @@ class _MyHomePageState extends State<MyHomePage> {
         
             // first segment of app 
             //second way of
+
               Chart(_recentTranscations),
               TransactionList(_userTransactions, _deleteTransaction)
         
