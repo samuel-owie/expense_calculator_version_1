@@ -16,7 +16,8 @@ class  TransactionList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 450,
-      child: transactions.isEmpty ? Column(children: <Widget>[
+      child: transactions.isEmpty ? 
+      Column(children: <Widget>[
         Text(
           'No Transactions added yet',
           style: Theme.of(context).textTheme.headline6,
@@ -50,11 +51,15 @@ class  TransactionList extends StatelessWidget {
               //     shape: BoxShape.circle,
               //   ),
               leading: CircleAvatar(
-                radius: 30,
+                radius: 35,
                 child: Padding(
                   padding: EdgeInsets.all(6),
                   child: FittedBox(
-                    child: Text('\$${transactions[index].amount}')
+                    child: Text('\$${transactions[index].amount.toStringAsFixed(1)}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      )
                     ),
                 ),
               ),
